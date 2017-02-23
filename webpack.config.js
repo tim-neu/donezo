@@ -9,9 +9,17 @@ const PATHS = {
 	build: path.join(__dirname, 'build')
 };
 
+process.env.BABEL_ENV = TARGET;
+
 const common = {
 	entry: {
 		app: PATHS.app
+	},
+	// Add resolve.extensions
+	// '' needed to allow imports without an extention.
+	// Note the .'s before extensions as it will fail to match without
+	resolve: {
+		extensions: ['.js', '.jsx']
 	},
 	output: {
 		path: PATHS.build,
@@ -24,6 +32,14 @@ const common = {
 				loaders: ['style-loader', 'css-loader'],
 				// Include accepts either a path or an array of paths.
 				include: PATHS.app
+			},
+			// Set up jsx. This accepts js too thanks to RegExp
+			{
+				test: /\.jsx?$/,
+				// Enable caching for improved performance during development
+				// loaders: ['babel-loader?cachDirectory'],
+				loaders: ['babel-loader'],
+				include: PATHS.app
 			}
 		]
 	}
@@ -33,7 +49,7 @@ const common = {
 // Default configuration
 if(TARGET === 'start' || !TARGET){
 	module.exports = merge(common, {
-		devTool: 'eval-source-map',
+		// devTool: 'eval-source-map',
 		devServer: {
 			contentBase: PATHS.build,
 
@@ -58,9 +74,9 @@ if(TARGET === 'start' || !TARGET){
 		},
 		plugins: [
 			new webpack.HotModuleReplacementPlugin(),
-			new NpmInstallPlugin({
-				save: true // --save
-			})
+			// new NpmInstallPlugin({
+			// 	save: true // --save
+			// })
 		]
 	});
 }
